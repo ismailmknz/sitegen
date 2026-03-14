@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { AuthProvider } from '@/components/AuthProvider'
 
 export const metadata: Metadata = {
   title: 'SiteGen - Générateur de site web professionnel',
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className="antialiased min-h-screen">{children}</body>
+      <body className="antialiased min-h-screen">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   )
 }

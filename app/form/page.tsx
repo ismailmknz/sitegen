@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useAuth } from '@/components/AuthProvider'
 import { saveCompanyData } from '@/lib/storage'
 import type { CompanySiteData } from '@/lib/types'
 
@@ -20,6 +21,7 @@ const SECTOR_OPTIONS = [
 
 export default function FormPage() {
   const router = useRouter()
+  const { user, loading } = useAuth()
   const [companyName, setCompanyName] = useState('')
   const [sector, setSector] = useState('')
   const [servicesText, setServicesText] = useState('')
@@ -58,6 +60,19 @@ export default function FormPage() {
     }
     saveCompanyData(data)
     router.push('/site')
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-100">
+        <div className="animate-pulse text-slate-500">Chargement…</div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    router.replace('/login?redirect=/form')
+    return null
   }
 
   return (

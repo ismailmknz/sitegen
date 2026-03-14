@@ -1,4 +1,45 @@
+'use client'
+
 import Link from 'next/link'
+import { Suspense } from 'react'
+import { useAuth } from '@/components/AuthProvider'
+
+function HeaderActions() {
+  const { user } = useAuth()
+
+  if (user) {
+    return (
+      <div className="flex items-center gap-3">
+        <span className="text-sm text-slate-600 hidden sm:inline">
+          Connecté en tant que <span className="font-medium text-slate-900">{user.email}</span>
+        </span>
+        <Link
+          href="/form"
+          className="rounded-lg bg-slate-800 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700 transition-colors"
+        >
+          Créer mon site
+        </Link>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-3">
+      <Link
+        href="/login"
+        className="rounded-lg border border-slate-200 bg-white text-slate-700 px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors"
+      >
+        Se connecter
+      </Link>
+      <Link
+        href="/signup"
+        className="rounded-lg bg-slate-800 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700 transition-colors"
+      >
+        S&apos;inscrire
+      </Link>
+    </div>
+  )
+}
 
 export default function HomePage() {
   return (
@@ -6,12 +47,9 @@ export default function HomePage() {
       <header className="border-b border-slate-200/80 bg-white/70 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <span className="text-xl font-bold text-slate-800 tracking-tight">SiteGen</span>
-          <Link
-            href="/form"
-            className="rounded-lg bg-slate-800 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700 transition-colors"
-          >
-            Créer mon site
-          </Link>
+          <Suspense fallback={null}>
+            <HeaderActions />
+          </Suspense>
         </div>
       </header>
 
