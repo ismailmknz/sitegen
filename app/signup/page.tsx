@@ -1,11 +1,12 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 
-export default function SignupPage() {
+function SignupInner() {
   const { signUp, loading, user } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -123,3 +124,10 @@ export default function SignupPage() {
   )
 }
 
+export default function SignupPage() {
+  return (
+    <Suspense fallback={null}>
+      <SignupInner />
+    </Suspense>
+  )
+}

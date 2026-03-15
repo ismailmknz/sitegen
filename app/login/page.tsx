@@ -1,11 +1,12 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/AuthProvider'
 
-export default function LoginPage() {
+function LoginInner() {
   const { signIn, loading, user } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -116,3 +117,10 @@ export default function LoginPage() {
   )
 }
 
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginInner />
+    </Suspense>
+  )
+}
