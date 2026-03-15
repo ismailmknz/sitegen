@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import type { User } from '@supabase/supabase-js'
+import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabaseClient'
 
 interface AuthContextValue {
@@ -10,6 +10,7 @@ interface AuthContextValue {
   signUp: (opts: { email: string; password: string }) => Promise<{ error?: string }>
   signIn: (opts: { email: string; password: string }) => Promise<{ error?: string }>
   signOut: () => Promise<void>
+  hasSupabase: boolean
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
@@ -17,13 +18,20 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const client = supabase as SupabaseClient | null
 
   useEffect(() => {
     let isMounted = true
 
     const init = async () => {
       setLoading(true)
-      const { data } = await supabase.auth.getUser()
+      if (!client) {
+        setUser(null)
+        setLoading(false)
+        return
+      }
+
+      const { data } = await client.auth.getUser()
       if (!isMounted) return
       setUser(data.user ?? null)
       setLoading(false)
@@ -31,36 +39,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     void init()
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
+    let subscription: { unsubscribe: () => void } | null = null
+
+    if (client) {
+      const res = client.auth.onAuthStateChange((_event, session) => {
+        setUser(session?.user ?? null)
+      })
+      subscription = res.data.subscription
+    }
 
     return () => {
       isMounted = false
-      subscription.unsubscribe()
+      subscription?.unsubscribe()
     }
   }, [])
 
   const signUp: AuthContextValue['signUp'] = async ({ email, password }) => {
-    const { error } = await supabase.auth.signUp({ email, password })
+    if (!client) {
+      return { error: 'Supabase non configuré.' }
+    }
+    const { error } = await client.auth.signUp({ email, password })
     if (error) return { error: error.message }
     return {}
   }
 
   const signIn: AuthContextValue['signIn'] = async ({ email, password }) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (!client) {
+      return { error: 'Supabase non configuré.' }
+    }
+    const { error } = await client.auth.signInWithPassword({ email, password })
     if (error) return { error: error.message }
     return {}
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    if (!client) return
+    await client.auth.signOut()
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signUp, signIn, signOut, hasSupabase: !!client }}>
       {children}
     </AuthContext.Provider>
   )
