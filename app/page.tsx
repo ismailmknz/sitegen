@@ -5,7 +5,7 @@ import { Suspense } from 'react'
 import { useAuth } from '@/components/AuthProvider'
 
 function HeaderActions() {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
 
   if (user) {
     return (
@@ -13,6 +13,13 @@ function HeaderActions() {
         <span className="text-sm text-slate-600 hidden sm:inline">
           Connecté en tant que <span className="font-medium text-slate-900">{user.email}</span>
         </span>
+        <button
+          type="button"
+          onClick={() => { void signOut() }}
+          className="rounded-lg border border-slate-200 bg-white text-slate-700 px-3 py-2 text-xs sm:text-sm font-medium hover:bg-slate-50 transition-colors"
+        >
+          Se déconnecter
+        </button>
         <Link
           href="/form"
           className="rounded-lg bg-slate-800 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700 transition-colors"

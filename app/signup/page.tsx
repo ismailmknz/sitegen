@@ -46,7 +46,12 @@ export default function SignupPage() {
     setSubmitting(false)
 
     if (signupError) {
-      setError(signupError)
+      const normalized = signupError.toLowerCase()
+      if (normalized.includes('already') || normalized.includes('exists')) {
+        setError('Cette adresse email est déjà utilisée.')
+      } else {
+        setError(signupError)
+      }
       return
     }
 

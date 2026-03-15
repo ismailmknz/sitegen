@@ -21,7 +21,7 @@ const SECTOR_OPTIONS = [
 
 export default function FormPage() {
   const router = useRouter()
-  const { user, loading } = useAuth()
+  const { user, loading, signOut } = useAuth()
   const [companyName, setCompanyName] = useState('')
   const [sector, setSector] = useState('')
   const [servicesText, setServicesText] = useState('')
@@ -82,12 +82,15 @@ export default function FormPage() {
           <Link href="/" className="text-xl font-bold text-slate-800 tracking-tight hover:text-slate-600">
             SiteGen
           </Link>
-          <Link
-            href="/"
-            className="rounded-lg border border-slate-200 bg-white text-slate-700 px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors"
-          >
-            Accueil
-          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => { void signOut(); router.push('/') }}
+              className="rounded-lg border border-slate-200 bg-white text-slate-700 px-4 py-2 text-sm font-medium hover:bg-slate-50 transition-colors"
+            >
+              Se déconnecter
+            </button>
+          </div>
         </div>
       </header>
 
